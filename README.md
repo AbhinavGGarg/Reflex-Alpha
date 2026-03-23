@@ -95,7 +95,7 @@ Risk controls:
 - **Backtest mode** runs across historical/simulated time-series and stores trades/equity curve.
 - **Live simulation mode** streams incremental ticks and prints real-time decisions.
 
-## Running Locally
+## Running Locally (CLI)
 
 From the `reflex-alpha` directory:
 
@@ -114,6 +114,15 @@ Try blending live Polymarket snapshots:
 ```bash
 python3 main.py --mode backtest --real-api
 ```
+
+## Deployment (Backend API, No UI)
+
+The Vercel deployment is API-first and returns JSON responses:
+
+- `GET /` -> service metadata + endpoint list
+- `GET /health` -> health check
+- `GET /backtest?points=420&seed=7&capital=10000` -> run a full backtest
+- `GET /live-simulation?live_steps=40&warmup=60&seed=7&capital=10000` -> run live simulation loop
 
 ## Console Output Example
 
