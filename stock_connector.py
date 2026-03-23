@@ -2,10 +2,16 @@ from __future__ import annotations
 
 import csv
 import io
+import ssl
+import urllib.error
+import urllib.request
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Optional
 
-import requests
+try:
+    import requests
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    requests = None  # type: ignore[assignment]
 
 
 @dataclass
@@ -32,13 +38,39 @@ class StockDataClient:
 
     def __init__(self, timeout: int = 12) -> None:
         self.timeout = timeout
-        self.session = requests.Session()
-        self.session.headers.update(
-            {
+        self.session: Optional["requests.Session"] = None
+
+        if requests is not None:
+            self.session = requests.Session()
+            self.session.headers.update(
+                {
+                    "User-Agent": "ReflexAlphaTerminal/1.0",
+                    "Accept": "text/csv,text/plain,*/*",
+                }
+            )
+
+    def _download_text(self, url: str) -> str:
+        if self.session is not None:
+            response = self.session.get(url, timeout=self.timeout)
+            response.raise_for_status()
+            return response.text
+
+        request = urllib.request.Request(
+            url,
+            headers={
                 "User-Agent": "ReflexAlphaTerminal/1.0",
                 "Accept": "text/csv,text/plain,*/*",
-            }
+            },
         )
+
+        # Prefer verified TLS; fallback handles local Python cert issues.
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                return response.read().decode("utf-8")
+        except urllib.error.URLError:
+            unverified = ssl._create_unverified_context()
+            with urllib.request.urlopen(request, timeout=self.timeout, context=unverified) as response:
+                return response.read().decode("utf-8")
 
     @staticmethod
     def normalize_symbol(symbol: str) -> str:
@@ -52,10 +84,8 @@ class StockDataClient:
     def fetch_quote(self, symbol: str) -> StockQuote:
         normalized = self.normalize_symbol(symbol)
         url = f"https://stooq.com/q/l/?s={normalized.lower()}&f=sd2t2ohlcv&h&e=csv"
-        response = self.session.get(url, timeout=self.timeout)
-        response.raise_for_status()
-
-        rows = list(csv.DictReader(io.StringIO(response.text)))
+        csv_text = self._download_text(url)
+        rows = list(csv.DictReader(io.StringIO(csv_text)))
         if not rows:
             raise ValueError(f"No quote rows returned for {symbol}")
 
@@ -77,10 +107,8 @@ class StockDataClient:
     def fetch_history(self, symbol: str, lookback_days: int = 120) -> StockHistory:
         normalized = self.normalize_symbol(symbol)
         url = f"https://stooq.com/q/d/l/?s={normalized.lower()}&i=d"
-        response = self.session.get(url, timeout=self.timeout)
-        response.raise_for_status()
-
-        reader = csv.DictReader(io.StringIO(response.text))
+        csv_text = self._download_text(url)
+        reader = csv.DictReader(io.StringIO(csv_text))
         closes: List[float] = []
         volumes: List[float] = []
 

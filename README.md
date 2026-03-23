@@ -16,19 +16,25 @@ It is not a web server and not an API.
 ## Run Simulation Mode
 
 ```bash
-python main.py
+python3 main.py
+```
+
+Or:
+
+```bash
+./run.sh
 ```
 
 Optional args:
 
 ```bash
-python main.py --steps 200 --delay 0.1 --seed 7 --capital 10000
+python3 main.py --steps 200 --delay 0.1 --seed 7 --capital 10000
 ```
 
 ## Run Live Stock Scanner Mode
 
 ```bash
-python main.py --mode stocks --symbols AAPL,MSFT,NVDA,TSLA --cycles 20 --refresh 20
+python3 main.py --mode stocks --symbols AAPL,MSFT,NVDA,TSLA --cycles 20 --refresh 20
 ```
 
 This mode pulls live US stock quotes + recent history and prints ranked signals in terminal each cycle.
@@ -49,3 +55,7 @@ It also prints a suggested dollar allocation based on confidence and volatility.
   - Max Drawdown
   - Total Trades
 - Supports a live stock scanner mode using real market data feeds
+
+## Troubleshooting
+
+- If you see `zsh: command not found: python`, use `python3` instead.
