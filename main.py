@@ -9,6 +9,7 @@ from execution import ExecutionEngine
 from market import MarketSimulator
 from risk import RiskManager
 from signals import SignalEngine
+from stock_mode import run_stock_terminal
 from strategy import StrategyEngine
 
 
@@ -131,16 +132,32 @@ def run_simulation(steps: int, delay: float, seed: int, initial_capital: float) 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Reflex Alpha local trading simulation")
-    parser.add_argument("--steps", type=int, default=200, help="Number of simulation steps")
-    parser.add_argument("--delay", type=float, default=0.10, help="Delay in seconds per step")
-    parser.add_argument("--seed", type=int, default=7, help="Random seed")
-    parser.add_argument("--capital", type=float, default=10_000.0, help="Initial capital")
+    parser.add_argument("--mode", choices=["sim", "stocks"], default="sim", help="Run simulation or live stock scanner")
+    parser.add_argument("--steps", type=int, default=200, help="Number of simulation steps (sim mode)")
+    parser.add_argument("--delay", type=float, default=0.10, help="Delay in seconds per step (sim mode)")
+    parser.add_argument("--seed", type=int, default=7, help="Random seed (sim mode)")
+    parser.add_argument("--capital", type=float, default=10_000.0, help="Initial capital (sim mode)")
+
+    # Stock mode args.
+    parser.add_argument("--symbols", type=str, default="AAPL,MSFT,NVDA,TSLA,AMZN", help="Comma-separated stock symbols")
+    parser.add_argument("--cycles", type=int, default=30, help="Number of scanner cycles (stocks mode)")
+    parser.add_argument("--refresh", type=float, default=20.0, help="Seconds between scanner cycles (stocks mode)")
+    parser.add_argument("--scanner-capital", type=float, default=10_000.0, help="Reference capital for sizing suggestions")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    run_simulation(steps=args.steps, delay=args.delay, seed=args.seed, initial_capital=args.capital)
+    if args.mode == "sim":
+        run_simulation(steps=args.steps, delay=args.delay, seed=args.seed, initial_capital=args.capital)
+        return
+
+    run_stock_terminal(
+        symbols_raw=args.symbols,
+        cycles=args.cycles,
+        refresh_seconds=args.refresh,
+        scanner_capital=args.scanner_capital,
+    )
 
 
 if __name__ == "__main__":
