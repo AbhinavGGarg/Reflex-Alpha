@@ -7,3 +7,6 @@ requires-python = ">=3.12"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.uv]
+package = false
