@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reflex Alpha</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        background: #0f1116;
+        color: #e8ebf2;
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        padding: 24px;
+      }
+      main {
+        width: min(860px, 100%);
+        border: 1px solid #2f3545;
+        border-radius: 12px;
+        padding: 20px;
+        background: #171a22;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.5rem;
+      }
+      p {
+        margin: 6px 0 12px;
+        color: #b8c0d4;
+      }
+      pre {
+        margin: 0;
+        background: #0d1017;
+        border: 1px solid #2f3545;
+        border-radius: 8px;
+        padding: 12px;
+        overflow-x: auto;
+      }
+      a { color: #8ab4ff; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Reflex Alpha</h1>
+      <p>Local Python trading engine (no API/server). This page exists only to prevent Vercel 404.</p>
+      <pre>python main.py
+python main.py --steps 200 --delay 0.1 --seed 7 --capital 10000</pre>
+      <p>Repo: <a href="https://github.com/AbhinavGGarg/Reflex-Alpha" target="_blank" rel="noreferrer">github.com/AbhinavGGarg/Reflex-Alpha</a></p>
+    </main>
+  </body>
+</html>
